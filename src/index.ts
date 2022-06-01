@@ -6,6 +6,7 @@ import { appendFile } from "fs/promises";
 
 import { Agent as HttpsAgent } from "https";
 
+const config = require("../config");
 const fetchthrottle = require("fetch-throttle");
 
 let throttler = fetchthrottle(fetch, 80, 1000);
@@ -15,23 +16,15 @@ const httpsAgent = new HttpsAgent({
   keepAliveMsecs: 90 * 60,
 });
 
-let API_TOKEN =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjJhN2QzMGZlLWYxOTYtNGM1NS05MWFiLTAwNDhjYTdhZTk4YSIsImlhdCI6MTY1NDA3NTQxMywic3ViIjoiZGV2ZWxvcGVyL2YxYzIyMTBlLTMwYzItNzkxMi0zM2E4LTkxMWJmYmExNmRjOSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI5My4yMTAuNS4xOTgiXSwidHlwZSI6ImNsaWVudCJ9XX0.A9wygWI5N30CoVCm6b_QAwkGeQPp0YpeR5SpkBlAhcYlMlMkRCzo6sWz8j5QOJ8wmNXF7eg0v-iX_AChI_4FOw";
-let API_URL = "https://api.clashroyale.com/v1/";
-let DATA_PATH = "data/";
-let DUMP_FILE = DATA_PATH + "stuff.njson";
-let PLAYER_TAGS_FILE = DATA_PATH + "playerTags.csv";
-let SHOULD_PRINT_PROGRESS = true;
-
 let STACK_SIZE = 4; // amount of players to check each iteration per country
 const ITERATION_COUNT = 20; // amount of iterations
 
 async function fetchJsonFromApi(query: String) {
   for (let attempt = 0; attempt < 3; attempt++) {
-    const response = await throttler(API_URL + query, {
+    const response = await throttler(config.API_URL + query, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + API_TOKEN,
+        Authorization: "Bearer " + config.API_TOKEN,
       },
       agent: httpsAgent,
       compress: true,
@@ -149,8 +142,8 @@ async function addPlayerToFile(
     player: playerData,
     battleLog: playerBattleLog,
   };
-  appendFile(DUMP_FILE, JSON.stringify(data) + "\n");
-  appendFile(PLAYER_TAGS_FILE, playerTag + "," + currentTimeMs + "\n");
+  appendFile(config.DUMP_FILE, JSON.stringify(data) + "\n");
+  appendFile(config.PLAYER_TAGS_FILE, playerTag + "," + currentTimeMs + "\n");
 }
 
 async function getInitialPlayerTags(locationBar: any, locations: any) {
@@ -173,7 +166,7 @@ async function getInitialPlayerTags(locationBar: any, locations: any) {
         playerTagsByCountry.push(countryPlayerTags);
       }
     }
-    if (SHOULD_PRINT_PROGRESS) {
+    if (config.SHOULD_PRINT_PROGRESS) {
       locationBar.increment(1, { name: location["name"] });
     }
   }
@@ -192,20 +185,20 @@ async function main() {
     Presets.shades_grey
   );
 
-  if (!SHOULD_PRINT_PROGRESS) {
+  if (!config.SHOULD_PRINT_PROGRESS) {
     multibar.stop();
   }
   //#endregion
 
   //#region filesystem setup
-  if (!existsSync(DATA_PATH)) {
-    mkdirSync(DATA_PATH, { recursive: true });
+  if (!existsSync(config.DATA_PATH)) {
+    mkdirSync(config.DATA_PATH, { recursive: true });
   }
-  if (!existsSync(PLAYER_TAGS_FILE)) {
-    writeFileSync(PLAYER_TAGS_FILE, "");
+  if (!existsSync(config.PLAYER_TAGS_FILE)) {
+    writeFileSync(config.PLAYER_TAGS_FILE, "");
   }
-  if (!existsSync(DUMP_FILE)) {
-    writeFileSync(DUMP_FILE, "");
+  if (!existsSync(config.DUMP_FILE)) {
+    writeFileSync(config.DUMP_FILE, "");
   }
   //#endregion
 
@@ -243,7 +236,7 @@ async function main() {
       }, 0);
 
     //#region progress bars
-    if (SHOULD_PRINT_PROGRESS) {
+    if (config.SHOULD_PRINT_PROGRESS) {
       totalPlayersBar.update(0);
       totalPlayersBar.setTotal(totalPlayerCount);
       locationBar.update(0);
@@ -252,7 +245,7 @@ async function main() {
     //#endregion
 
     for (const playerTags of initialPlayerTagsByLocation) {
-      if (SHOULD_PRINT_PROGRESS) {
+      if (config.SHOULD_PRINT_PROGRESS) {
         playerBar.update(0);
         playerBar.setTotal(playerTags.length);
         locationBar.increment();
@@ -266,7 +259,7 @@ async function main() {
             getPlayerBattles(encodeURIComponent(playerTag)),
           ];
           let [playerData, playerBattleLog] = await Promise.all(promises);
-          if (SHOULD_PRINT_PROGRESS) {
+          if (config.SHOULD_PRINT_PROGRESS) {
             playerBar.increment({ name: playerTag });
             totalPlayersBar.increment({ name: playerTag });
           }
