@@ -10,7 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/cli-progress": "^3.11.0",
-    "cli-progress": "^3.11.1"
+    "cli-progress": "^3.11.1",
+    "ts-node": "^10.8.0"
   },
   "dependencies": {
     "@types/node-fetch": "^2.6.1",
