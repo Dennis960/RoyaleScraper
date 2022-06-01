@@ -94,7 +94,7 @@ export async function getLocationGlobalTournamentRankings(
   );
 }
 export async function getLocations() {
-  return await fetchJsonFromApi<{
+  let locations = await fetchJsonFromApi<{
     items: [
       {
         isCountry: boolean;
@@ -103,6 +103,10 @@ export async function getLocations() {
       }
     ];
   }>("locations");
+  if (!locations) {
+    throw "Locations not found";
+  }
+  return locations;
 }
 export async function getPlayerRankingsAtLocation(locationId: String) {
   return await fetchJsonFromApi<{

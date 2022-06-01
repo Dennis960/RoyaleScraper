@@ -1,5 +1,3 @@
-import { appendFile } from "fs/promises";
-
 import {
   getPlayer,
   getPlayerRankingsAtLocation,
@@ -9,35 +7,20 @@ import {
 
 const config = require("../config.json");
 import {
-  initFiles,
-  initProgressBar,
+  initOutputDirectory,
   shuffleArray,
+  addPlayerToFile,
+  count2DArrayElements,
+} from "./utils";
+import {
+  initProgressBar,
   onIterationIncremented,
   onLocationAdded,
   onPlayerAdded,
   stopProgressBars,
-} from "./utils";
+} from "./progressBar";
 
-async function addPlayerToFile(
-  playerTag: string,
-  playerData: {},
-  playerBattleLog: any[]
-) {
-  let currentTimeMs = new Date().valueOf();
-  let data = {
-    tag: playerTag,
-    timestamp: currentTimeMs,
-    player: playerData,
-    battleLog: playerBattleLog,
-  };
-  appendFile(config.DATA_PATH + config.DUMP_FILE, JSON.stringify(data) + "\n");
-  appendFile(
-    config.DATA_PATH + config.PLAYER_TAGS_FILE,
-    playerTag + "," + currentTimeMs + "\n"
-  );
-}
-
-async function getInitialPlayerTags(
+async function getInitialPlayerTagsFromLocations(
   locations: [{ isCountry: boolean; id: string; name: string }]
 ) {
   let playerTagsByCountry: string[][] = [];
@@ -96,38 +79,21 @@ async function getAllOpponents(
 async function main() {
   console.time("main");
 
-  let locationObject = await getLocations();
-  if (!locationObject) {
-    throw "Cannot get locations";
-  }
-  let locations = locationObject.items;
+  let locations = (await getLocations()).items;
   initProgressBar(locations.length);
 
-  initFiles();
+  initOutputDirectory();
 
-  let initialPlayerTagsByLocation: string[][] = await getInitialPlayerTags(
-    locations
-  );
-  let allPlayerTags: any[] = [];
-  for (const playerTags of initialPlayerTagsByLocation) {
-    playerTags.map((tag: string) => allPlayerTags.push(tag));
-  }
+  let initialPlayerTags = await getInitialPlayerTagsFromLocations(locations);
+  let allPlayerTags = [].concat(...initialPlayerTags);
   // code can be injected here for a different starting array of players
 
   for (let i = 0; i < config.ITERATION_COUNT; i++) {
     let newPlayerTagsByLocation = [];
-    let totalPlayerCount = initialPlayerTagsByLocation
-      .map((a) => a.length)
-      .reduce(function (pv, cv) {
-        return pv + cv;
-      }, 0);
+    let totalPlayerCount = count2DArrayElements(initialPlayerTags);
+    onIterationIncremented(totalPlayerCount, initialPlayerTags.length);
 
-    onIterationIncremented(
-      totalPlayerCount,
-      initialPlayerTagsByLocation.length
-    );
-
-    for (const playerTags of initialPlayerTagsByLocation) {
+    for (const playerTags of initialPlayerTags) {
       onLocationAdded("", playerTags.length);
       let opponentPlayerTags: any[] = await getAllOpponents(
         playerTags,
@@ -141,14 +107,15 @@ async function main() {
           })
         ),
       ];
-      allPlayerTags.concat(opponentPlayerTags);
-      newPlayerTagsByLocation.push(opponentPlayerTags);
+      allPlayerTags.concat(opponentPlayerTags); // add to list of all players
+      newPlayerTagsByLocation.push(opponentPlayerTags); // player tags to go through next iteration
     }
 
+    // limit players per location to stack size and choose randomly
     newPlayerTagsByLocation.forEach(function (_, index, arr) {
       arr[index] = shuffleArray(arr[index]).slice(0, config.STACK_SIZE);
     });
-    initialPlayerTagsByLocation = newPlayerTagsByLocation;
+    initialPlayerTags = newPlayerTagsByLocation;
   }
 
   stopProgressBars();
