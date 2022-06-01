@@ -36,7 +36,10 @@ export async function fetchJsonFromApi<T>(query: String) {
 
 //#region Player
 export async function getPlayer(playerTag: String) {
-  return await fetchJsonFromApi<{}>("players/" + playerTag);
+  return await fetchJsonFromApi<{
+    tag: string;
+    name: string;
+  }>("players/" + playerTag);
 }
 export async function getPlayerBattles(playerTag: String) {
   return await fetchJsonFromApi<any[]>("players/" + playerTag + "/battlelog");

@@ -55,14 +55,18 @@ async function getAllOpponents(
   await Promise.all(
     playerTags.map(async (playerTag: string) => {
       //#region fetch player data
-      let promises: [Promise<{} | null>, Promise<any[] | null>] = [
-        getPlayer(encodeURIComponent(playerTag)),
-        getPlayerBattles(encodeURIComponent(playerTag)),
-      ];
-      let [playerData, playerBattleLog] = await Promise.all(promises);
-      onOpponentAdded(playerTag);
+      let getPlayerPromise = getPlayer(encodeURIComponent(playerTag));
+      let getPlayerBattlesPromise = getPlayerBattles(
+        encodeURIComponent(playerTag)
+      );
+
+      let [playerData, playerBattleLog] = await Promise.all([
+        getPlayerPromise,
+        getPlayerBattlesPromise,
+      ]);
       //#endregion
       if (playerData && playerBattleLog) {
+        onOpponentAdded(playerData.name);
         addPlayerToFile(playerTag, playerData, playerBattleLog);
 
         // iterate opponents
@@ -85,7 +89,7 @@ async function main() {
   initOutputDirectory();
 
   let initialPlayerTags = await getInitialPlayerTagsFromLocations(locations);
-  let allPlayerTags = [].concat(...initialPlayerTags);
+  let allPlayerTags: string[] = ([] as string[]).concat(...initialPlayerTags);
   // code can be injected here for a different starting array of players
 
   for (let i = 0; i < config.ITERATION_COUNT; i++) {
