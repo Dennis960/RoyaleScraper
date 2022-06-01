@@ -8,7 +8,7 @@ Then run ts-node ./src/index.ts
 
 # Settings
 
-Settings are found inside [`config.js`](src/config.js)
+Settings are found inside [`config.js`](config.js)
 
 - `API_TOKEN` - Your token from the [account page of clash royale](https://developer.clashroyale.com/#/account).
 - `DATA_PATH` - Where to store the output.
