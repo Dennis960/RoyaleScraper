@@ -16,9 +16,6 @@ const httpsAgent = new HttpsAgent({
   keepAliveMsecs: 90 * 60,
 });
 
-let STACK_SIZE = 4; // amount of players to check each iteration per country
-const ITERATION_COUNT = 20; // amount of iterations
-
 async function fetchJsonFromApi(query: String) {
   for (let attempt = 0; attempt < 3; attempt++) {
     const response = await throttler(config.API_URL + query, {
@@ -159,7 +156,7 @@ async function getInitialPlayerTags(locationBar: any, locations: any) {
         for (const player of shuffle(playerRankings)) {
           let playerTag = player["tag"];
           countryPlayerTags.push(playerTag);
-          if (countryPlayerTags.length == STACK_SIZE) {
+          if (countryPlayerTags.length == config.STACK_SIZE) {
             break;
           }
         }
@@ -205,7 +202,7 @@ async function main() {
   let locations = await getLocations();
   locations = locations["items"];
 
-  const iterationBar = multibar.create(ITERATION_COUNT, 0, {
+  const iterationBar = multibar.create(config.ITERATION_COUNT, 0, {
     title: "Iteration",
     name: "",
   });
@@ -226,7 +223,7 @@ async function main() {
 
   const totalPlayersBar = multibar.create(0, 0, { title: "Players  " });
   const playerBar = multibar.create(0, 0, { title: "Player   " });
-  for (let i = 0; i < ITERATION_COUNT; i++) {
+  for (let i = 0; i < config.ITERATION_COUNT; i++) {
     iterationBar.increment();
     let newPlayerTags = [];
     let totalPlayerCount = initialPlayerTagsByLocation
@@ -283,7 +280,7 @@ async function main() {
     }
 
     newPlayerTags.forEach(function (_, index, arr: any) {
-      arr[index] = shuffle(arr[index]).slice(0, STACK_SIZE);
+      arr[index] = shuffle(arr[index]).slice(0, config.STACK_SIZE);
     });
     initialPlayerTagsByLocation = newPlayerTags;
   }

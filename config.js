@@ -8,4 +8,7 @@ config.DUMP_FILE = DATA_PATH + "stuff.njson";
 config.PLAYER_TAGS_FILE = DATA_PATH + "playerTags.csv";
 config.SHOULD_PRINT_PROGRESS = true;
 
+config.STACK_SIZE = 4; // amount of players to check each iteration per country
+config.ITERATION_COUNT = 20; // amount of iterations
+
 module.exports(config);
