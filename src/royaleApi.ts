@@ -102,7 +102,7 @@ export async function getLocations() {
         name: string;
       }
     ];
-  } | null>("locations");
+  }>("locations");
 }
 export async function getPlayerRankingsAtLocation(locationId: String) {
   return await fetchJsonFromApi<{
@@ -111,6 +111,6 @@ export async function getPlayerRankingsAtLocation(locationId: String) {
         tag: string;
       }
     ];
-  } | null>("locations/" + locationId + "/rankings/players");
+  }>("locations/" + locationId + "/rankings/players");
 }
 //#endregion
