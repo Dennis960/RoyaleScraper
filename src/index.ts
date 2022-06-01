@@ -6,48 +6,35 @@ import { appendFile } from "fs/promises";
 
 import { Agent as HttpsAgent } from "https";
 
-const fetchthrottle = require("fetch-throttle");
-
-let throttler = fetchthrottle(fetch, 80, 1000);
-
 const httpsAgent = new HttpsAgent({
   keepAlive: true,
   keepAliveMsecs: 90 * 60,
 });
 
 let API_TOKEN =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjJhN2QzMGZlLWYxOTYtNGM1NS05MWFiLTAwNDhjYTdhZTk4YSIsImlhdCI6MTY1NDA3NTQxMywic3ViIjoiZGV2ZWxvcGVyL2YxYzIyMTBlLTMwYzItNzkxMi0zM2E4LTkxMWJmYmExNmRjOSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI5My4yMTAuNS4xOTgiXSwidHlwZSI6ImNsaWVudCJ9XX0.A9wygWI5N30CoVCm6b_QAwkGeQPp0YpeR5SpkBlAhcYlMlMkRCzo6sWz8j5QOJ8wmNXF7eg0v-iX_AChI_4FOw";
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImVkYjQ1ZjJhLWEwZTUtNGZmNS1hY2YyLWY1YjNmNTIzNjJiNCIsImlhdCI6MTY1Mzk5Nzk1MCwic3ViIjoiZGV2ZWxvcGVyL2YxYzIyMTBlLTMwYzItNzkxMi0zM2E4LTkxMWJmYmExNmRjOSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI5My4yMTAuNi4xMTQiXSwidHlwZSI6ImNsaWVudCJ9XX0.1mO_yQHuXGhuVIewm-stcd5Ay_iTmHOoN9sNgtgRmgSSUW1nDt8NWD8FCVLOFmot8M7dmHm5TvI6WyVSSFMoHA";
 let API_URL = "https://api.clashroyale.com/v1/";
 let DATA_PATH = "data/";
 let DUMP_FILE = DATA_PATH + "stuff.njson";
 let PLAYER_TAGS_FILE = DATA_PATH + "playerTags.csv";
-let SHOULD_PRINT_PROGRESS = true;
 
-let STACK_SIZE = 4; // amount of players to check each iteration per country
-const ITERATION_COUNT = 20; // amount of iterations
+let STACK_SIZE = 10; // amount of players to check each iteration per country
+const ITERATION_COUNT = 3; // amount of iterations
 
 async function fetchJsonFromApi(query: String) {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const response = await throttler(API_URL + query, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + API_TOKEN,
-      },
-      agent: httpsAgent,
-      compress: true,
-    });
-
-    if (response.status == 200) {
-      const jsonData = await response.json();
-      return jsonData;
-    } else if (response.status != 429) {
-      return null;
-    } else {
-      console.log("429");
-    }
-    await new Promise((resolve) => setTimeout(resolve, 200));
+  const response = await fetch(API_URL + query, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + API_TOKEN,
+    },
+    agent: httpsAgent,
+    compress: true,
+  });
+  if (response.status != 200) {
+    return null;
   }
-  return null;
+  const jsonData = await response.json();
+  return jsonData;
 }
 
 //#region Player
@@ -149,14 +136,15 @@ async function addPlayerToFile(
     player: playerData,
     battleLog: playerBattleLog,
   };
-  appendFile(DUMP_FILE, JSON.stringify(data) + "\n");
-  appendFile(PLAYER_TAGS_FILE, playerTag + "," + currentTimeMs + "\n");
+  await appendFile(DUMP_FILE, JSON.stringify(data) + "\n");
+  await appendFile(PLAYER_TAGS_FILE, playerTag + "," + currentTimeMs + "\n");
 }
 
 async function getInitialPlayerTags(locationBar: any, locations: any) {
-  let playerTagsByCountry: any[] = [];
+  let playerTagsByCountry = [];
   console.log("fetching global rankings");
   for (const location of locations) {
+    locationBar.increment(1, { name: location["name"] });
     if (location["isCountry"]) {
       let locationId = location["id"];
       let playerRankings = await getPlayerRankingsAtLocation(locationId);
@@ -171,10 +159,8 @@ async function getInitialPlayerTags(locationBar: any, locations: any) {
           }
         }
         playerTagsByCountry.push(countryPlayerTags);
+        break;
       }
-    }
-    if (SHOULD_PRINT_PROGRESS) {
-      locationBar.increment(1, { name: location["name"] });
     }
   }
   return playerTagsByCountry;
@@ -191,15 +177,11 @@ async function main() {
     },
     Presets.shades_grey
   );
-
-  if (!SHOULD_PRINT_PROGRESS) {
-    multibar.stop();
-  }
   //#endregion
 
   //#region filesystem setup
   if (!existsSync(DATA_PATH)) {
-    mkdirSync(DATA_PATH, { recursive: true });
+    mkdirSync(DATA_PATH);
   }
   if (!existsSync(PLAYER_TAGS_FILE)) {
     writeFileSync(PLAYER_TAGS_FILE, "");
@@ -227,7 +209,7 @@ async function main() {
   );
   let allPlayerTags: any[] = [];
   for (const playerTags of initialPlayerTagsByLocation) {
-    playerTags.map((tag: any) => allPlayerTags.push(tag));
+    playerTags.map((tag) => allPlayerTags.push(tag));
   }
   // code can be injected here for a different starting array of players
 
@@ -243,49 +225,40 @@ async function main() {
       }, 0);
 
     //#region progress bars
-    if (SHOULD_PRINT_PROGRESS) {
-      totalPlayersBar.update(0);
-      totalPlayersBar.setTotal(totalPlayerCount);
-      locationBar.update(0);
-      locationBar.setTotal(initialPlayerTagsByLocation.length);
-    }
+    totalPlayersBar.update(0);
+    totalPlayersBar.setTotal(totalPlayerCount);
+    locationBar.update(0);
+    locationBar.setTotal(initialPlayerTagsByLocation.length);
     //#endregion
 
     for (const playerTags of initialPlayerTagsByLocation) {
-      if (SHOULD_PRINT_PROGRESS) {
-        playerBar.update(0);
-        playerBar.setTotal(playerTags.length);
-        locationBar.increment();
-      }
-      let opponentPlayerTags: any[] = [];
-      await Promise.all(
-        playerTags.map(async (playerTag: any) => {
-          //#region fetch player data
-          let promises = [
-            getPlayer(encodeURIComponent(playerTag)),
-            getPlayerBattles(encodeURIComponent(playerTag)),
-          ];
-          let [playerData, playerBattleLog] = await Promise.all(promises);
-          if (SHOULD_PRINT_PROGRESS) {
-            playerBar.increment({ name: playerTag });
-            totalPlayersBar.increment({ name: playerTag });
-          }
-          //#endregion
+      playerBar.update(0);
+      playerBar.setTotal(playerTags.length);
+      let opponentPlayerTags = [];
+      locationBar.increment();
+      for (const playerTag of playerTags) {
+        //#region fetch player data
+        playerBar.increment({ name: playerTag });
+        totalPlayersBar.increment({ name: playerTag });
+        let playerData = await getPlayer(encodeURIComponent(playerTag));
+        let playerBattleLog = await getPlayerBattles(
+          encodeURIComponent(playerTag)
+        );
+        //#endregion
 
-          if (playerData && playerBattleLog) {
-            addPlayerToFile(playerTag, playerData, playerBattleLog);
+        if (playerData && playerBattleLog) {
+          await addPlayerToFile(playerTag, playerData, playerBattleLog);
 
-            // iterate opponents
-            for (const battle of shuffle(playerBattleLog)) {
-              let opponentPlayerTag: any = battle["opponent"][0]["tag"];
-              // check if tag already in data
-              if (!allPlayerTags.includes(opponentPlayerTag)) {
-                opponentPlayerTags.push(opponentPlayerTag);
-              }
+          // iterate opponents
+          for (const battle of shuffle(playerBattleLog)) {
+            let opponentPlayerTag: any = battle["opponent"][0]["tag"];
+            // check if tag already in data
+            if (!allPlayerTags.includes(opponentPlayerTag)) {
+              opponentPlayerTags.push(opponentPlayerTag);
             }
           }
-        })
-      );
+        }
+      }
       newPlayerTags.push(opponentPlayerTags);
     }
 
@@ -296,6 +269,7 @@ async function main() {
   }
 
   multibar.stop();
+
   console.timeEnd("main");
 }
 
