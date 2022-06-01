@@ -8,6 +8,8 @@ Then run ts-node ./src/index.ts
 
 # Settings
 
+Settings are found at the top of `index.ts`
+
 - `let API_TOKEN` - Your token from the [account page of clash royale](https://developer.clashroyale.com/#/account).
 - `let DATA_PATH` - Where to store the output.
 - `let DUMP_FILE` - Filename of the output njson file.
