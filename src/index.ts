@@ -7,7 +7,7 @@ import {
   getPlayerBattles,
 } from "./royaleApi";
 
-import { config } from "../config";
+const config = require("../config.json");
 import {
   initFiles,
   initProgressBar,
@@ -30,8 +30,11 @@ async function addPlayerToFile(
     player: playerData,
     battleLog: playerBattleLog,
   };
-  appendFile(config.DUMP_FILE, JSON.stringify(data) + "\n");
-  appendFile(config.PLAYER_TAGS_FILE, playerTag + "," + currentTimeMs + "\n");
+  appendFile(config.DATA_PATH + config.DUMP_FILE, JSON.stringify(data) + "\n");
+  appendFile(
+    config.DATA_PATH + config.PLAYER_TAGS_FILE,
+    playerTag + "," + currentTimeMs + "\n"
+  );
 }
 
 async function getInitialPlayerTags(
@@ -56,9 +59,7 @@ async function getInitialPlayerTags(
         playerTagsByCountry.push(countryPlayerTags);
       }
     }
-    if (config.SHOULD_PRINT_PROGRESS) {
-      onLocationAdded(location.name);
-    }
+    onLocationAdded(location.name);
   }
   return playerTagsByCountry;
 }
@@ -76,9 +77,7 @@ async function getAllOpponents(
         getPlayerBattles(encodeURIComponent(playerTag)),
       ];
       let [playerData, playerBattleLog] = await Promise.all(promises);
-      if (config.SHOULD_PRINT_PROGRESS) {
-        onOpponentAdded(playerTag);
-      }
+      onOpponentAdded(playerTag);
       //#endregion
       if (playerData && playerBattleLog) {
         addPlayerToFile(playerTag, playerData, playerBattleLog);
@@ -106,8 +105,9 @@ async function main() {
 
   initFiles();
 
-  let initialPlayerTagsByLocation: string[][];
-  initialPlayerTagsByLocation = await getInitialPlayerTags(locations);
+  let initialPlayerTagsByLocation: string[][] = await getInitialPlayerTags(
+    locations
+  );
   let allPlayerTags: any[] = [];
   for (const playerTags of initialPlayerTagsByLocation) {
     playerTags.map((tag: string) => allPlayerTags.push(tag));
@@ -128,9 +128,7 @@ async function main() {
     );
 
     for (const playerTags of initialPlayerTagsByLocation) {
-      if (config.SHOULD_PRINT_PROGRESS) {
-        onLocationAdded("", playerTags.length);
-      }
+      onLocationAdded("", playerTags.length);
       let opponentPlayerTags: any[] = await getAllOpponents(
         playerTags,
         onPlayerAdded

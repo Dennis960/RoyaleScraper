@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { Agent as HttpsAgent } from "https";
 
-import { config } from "../config";
+const config = require("../config.json");
 const fetchthrottle = require("fetch-throttle");
 let throttler = fetchthrottle(fetch, 80, 1000);
 

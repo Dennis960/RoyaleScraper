@@ -8,12 +8,12 @@ Then run ts-node ./src/index.ts
 
 # Settings
 
-Settings are found inside [`config.js`](config.js)
+Settings are found inside [`config.json`](config.json)
 
 - `API_TOKEN` - Your token from the [account page of clash royale](https://developer.clashroyale.com/#/account).
 - `DATA_PATH` - Where to store the output.
 - `DUMP_FILE` - Filename of the output njson file.
-- `PLAYER_TAGS_FILE` - Filename of the csv tracking all player tags.
+- `PLAYER_TAGS_FILE` - Filename of the output csv tracking all player tags.
 - `SHOULD_PRINT_PROGRESS` - Set true to print a progress bar.
 
 - `STACK_SIZE` - Number of players fetched per country each iteration.
