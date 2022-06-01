@@ -25,3 +25,4 @@ Settings are found at the top of `index.ts`
 - `const ITERATION_COUNT = 20;`
 
 Results in arround 20k players and takes arround 23 minutes to complete.
+Final file size: 2.7 GB
