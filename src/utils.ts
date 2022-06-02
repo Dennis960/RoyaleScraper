@@ -1,15 +1,4 @@
-const config: {
-  API_TOKEN_FILE: string;
-  API_TOKEN: string;
-  API_URL: string;
-  DATA_PATH: string;
-  DUMP_FILE: string;
-  PLAYER_TAGS_FILE: string;
-  SHOULD_PRINT_PROGRESS: boolean;
-
-  STACK_SIZE: 4;
-  ITERATION_COUNT: 20;
-} = require("../config.json");
+import { config } from "./config";
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from "fs";
 import { appendFile } from "fs/promises";
 

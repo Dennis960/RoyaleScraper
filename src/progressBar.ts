@@ -1,17 +1,16 @@
-const config = require("../config.json");
+import { config } from "./config";
 import { MultiBar, Presets, SingleBar } from "cli-progress";
 
 let multibar: MultiBar;
-let playerBar: SingleBar,
-  totalPlayersBar: SingleBar,
-  iterationBar: SingleBar,
-  locationBar: SingleBar;
+let totalPlayersBar: SingleBar, iterationBar: SingleBar, locationBar: SingleBar;
+let playerTimes: number[] = [];
 
 export function initProgressBar(locationsCount: number) {
   if (config.SHOULD_PRINT_PROGRESS) {
     multibar = new MultiBar(
       {
-        format: "{title} [{bar}] {percentage}% | {name} | {value}/{total}",
+        format:
+          "{title} [{bar}] {percentage}% | {name} | {value}/{total} | {speed}/s",
         clearOnComplete: false,
         hideCursor: true,
       },
@@ -20,27 +19,36 @@ export function initProgressBar(locationsCount: number) {
 
     iterationBar = multibar.create(config.ITERATION_COUNT, 0, {
       title: "Iteration",
-      name: "",
+      name: "".padEnd(30, " "),
+      speed: "-",
     });
     locationBar = multibar.create(locationsCount, 0, {
       title: "Location ",
+      name: "".padEnd(30, " "),
+      speed: "-",
     });
-    totalPlayersBar = multibar.create(1, 0, { title: "Players  " });
-    playerBar = multibar.create(1, 0, { title: "Player   " });
+    totalPlayersBar = multibar.create(1, 0, {
+      title: "Players  ",
+      name: "".padEnd(30, " "),
+      speed: "",
+    });
   }
 }
 export function onPlayerAdded(playerTag: string) {
   if (config.SHOULD_PRINT_PROGRESS) {
-    playerBar.increment({ name: playerTag });
-    totalPlayersBar.increment({ name: playerTag });
+    playerTimes.push(new Date().valueOf());
+    let last30PlayerTimes = playerTimes.slice(-30);
+    let speed = (last30PlayerTimes[29] - last30PlayerTimes[0]) / 30;
+    totalPlayersBar.increment({
+      name: playerTag.padEnd(30, " "),
+      speed: Math.round(speed),
+    });
   }
 }
 
-export function onLocationAdded(locationName: string, playerCount: number = 1) {
+export function onLocationAdded(locationName: string) {
   if (config.SHOULD_PRINT_PROGRESS) {
-    locationBar.increment({ name: locationName });
-    playerBar.setTotal(playerCount);
-    playerBar.update(0);
+    locationBar.increment({ name: locationName.padEnd(30, " ") });
   }
 }
 export function onIterationIncremented(
@@ -59,5 +67,13 @@ export function onIterationIncremented(
 export function stopProgressBars() {
   if (config.SHOULD_PRINT_PROGRESS) {
     multibar.stop();
+  }
+}
+
+export function error429() {
+  if (config.SHOULD_PRINT_PROGRESS) {
+    totalPlayersBar.update({
+      name: "ERROR 429, please wait...".padEnd(30, " "),
+    });
   }
 }

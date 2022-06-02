@@ -1,51 +1,38 @@
-import fetch from "node-fetch";
+import fetch, { Response } from "node-fetch";
 import { Agent as HttpsAgent } from "https";
 import { readApiToken } from "./utils";
 
-const config: {
-  API_TOKEN_FILE: string;
-  API_TOKEN: string;
-  API_URL: string;
-  DATA_PATH: string;
-  DUMP_FILE: string;
-  PLAYER_TAGS_FILE: string;
-  SHOULD_PRINT_PROGRESS: boolean;
+import { config } from "./config";
 
-  STACK_SIZE: 4;
-  ITERATION_COUNT: 20;
-} = require("../config.json");
-const fetchthrottle = require("fetch-throttle");
-let throttler = fetchthrottle(fetch, 80, 1000);
+import { fetchthrottle } from "./fetch-throttle";
+import { error429 } from "./progressBar";
+let throttler: Function = fetchthrottle(fetch, 1, 13);
 
 const httpsAgent = new HttpsAgent({
   keepAlive: true,
   keepAliveMsecs: 90 * 60,
 });
-
 const API_TOKEN = readApiToken();
 
-export async function fetchJsonFromApi<T>(query: String) {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const response = await throttler(config.API_URL + query, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + API_TOKEN,
-      },
-      agent: httpsAgent,
-      compress: true,
-    });
+export async function fetchJsonFromApi<T>(query: String): Promise<any> {
+  const response: Response = await throttler(config.API_URL + query, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + API_TOKEN,
+    },
+    agent: httpsAgent,
+    compress: true,
+  });
 
-    if (response.status == 200) {
-      const jsonData = await response.json();
-      return jsonData as T;
-    } else if (response.status != 429) {
-      return null;
-    } else {
-      console.log("429");
-    }
-    await new Promise((resolve) => setTimeout(resolve, 200));
+  if (response.status == 200) {
+    const jsonData = await response.json();
+    return jsonData as T;
+  } else if (response.status != 429) {
+    return null;
+  } else {
+    error429();
+    return await fetchJsonFromApi(query);
   }
-  return null;
 }
 
 //#region Player
