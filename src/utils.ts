@@ -27,10 +27,12 @@ export function initOutputDirectory() {
 
 export function readApiToken() {
   if (existsSync(config.API_TOKEN_FILE)) {
-    return readFileSync(config.API_TOKEN_FILE, "utf-8");
-  } else {
-    return config.API_TOKEN;
+    let token = readFileSync(config.API_TOKEN_FILE, "utf-8");
+    if (token) {
+      return token;
+    }
   }
+  return config.API_TOKEN;
 }
 
 export async function addPlayerToFile(
