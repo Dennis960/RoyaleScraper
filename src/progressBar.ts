@@ -3,6 +3,7 @@ import { MultiBar, Presets, SingleBar } from "cli-progress";
 
 let multibar: MultiBar;
 let totalPlayersBar: SingleBar, iterationBar: SingleBar, locationBar: SingleBar;
+let locationTimes: number[] = [];
 let playerTimes: number[] = [];
 
 export function initProgressBar(locationsCount: number) {
@@ -38,7 +39,7 @@ export function onPlayerAdded(playerTag: string) {
   if (config.SHOULD_PRINT_PROGRESS) {
     playerTimes.push(new Date().valueOf());
     let last30PlayerTimes = playerTimes.slice(-30);
-    let speed = (last30PlayerTimes[29] - last30PlayerTimes[0]) / 30;
+    let speed = 1000 / ((last30PlayerTimes[29] - last30PlayerTimes[0]) / 30);
     totalPlayersBar.increment({
       name: playerTag.padEnd(30, " "),
       speed: Math.round(speed),
@@ -48,7 +49,14 @@ export function onPlayerAdded(playerTag: string) {
 
 export function onLocationAdded(locationName: string) {
   if (config.SHOULD_PRINT_PROGRESS) {
-    locationBar.increment({ name: locationName.padEnd(30, " ") });
+    locationTimes.push(new Date().valueOf());
+    let last30LocationTimes = locationTimes.slice(-30);
+    let speed =
+      1000 / ((last30LocationTimes[29] - last30LocationTimes[0]) / 30);
+    locationBar.increment({
+      name: locationName.padEnd(30, " "),
+      speed: Math.round(speed),
+    });
   }
 }
 export function onIterationIncremented(
