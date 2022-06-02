@@ -1,7 +1,19 @@
 import fetch from "node-fetch";
 import { Agent as HttpsAgent } from "https";
+import { readApiToken } from "./utils";
 
-const config = require("../config.json");
+const config: {
+  API_TOKEN_FILE: string;
+  API_TOKEN: string;
+  API_URL: string;
+  DATA_PATH: string;
+  DUMP_FILE: string;
+  PLAYER_TAGS_FILE: string;
+  SHOULD_PRINT_PROGRESS: boolean;
+
+  STACK_SIZE: 4;
+  ITERATION_COUNT: 20;
+} = require("../config.json");
 const fetchthrottle = require("fetch-throttle");
 let throttler = fetchthrottle(fetch, 80, 1000);
 
@@ -10,12 +22,14 @@ const httpsAgent = new HttpsAgent({
   keepAliveMsecs: 90 * 60,
 });
 
+const API_TOKEN = readApiToken();
+
 export async function fetchJsonFromApi<T>(query: String) {
   for (let attempt = 0; attempt < 3; attempt++) {
     const response = await throttler(config.API_URL + query, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + config.API_TOKEN,
+        Authorization: "Bearer " + API_TOKEN,
       },
       agent: httpsAgent,
       compress: true,

@@ -1,5 +1,16 @@
-const config = require("../config.json");
-import { writeFileSync, mkdirSync, existsSync } from "fs";
+const config: {
+  API_TOKEN_FILE: string;
+  API_TOKEN: string;
+  API_URL: string;
+  DATA_PATH: string;
+  DUMP_FILE: string;
+  PLAYER_TAGS_FILE: string;
+  SHOULD_PRINT_PROGRESS: boolean;
+
+  STACK_SIZE: 4;
+  ITERATION_COUNT: 20;
+} = require("../config.json");
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from "fs";
 import { appendFile } from "fs/promises";
 
 export function initOutputDirectory() {
@@ -11,6 +22,14 @@ export function initOutputDirectory() {
   }
   if (!existsSync(config.DATA_PATH + config.DUMP_FILE)) {
     writeFileSync(config.DATA_PATH + config.DUMP_FILE, "");
+  }
+}
+
+export function readApiToken() {
+  if (existsSync(config.API_TOKEN_FILE)) {
+    return readFileSync(config.API_TOKEN_FILE, "utf-8");
+  } else {
+    return config.API_TOKEN;
   }
 }
 
