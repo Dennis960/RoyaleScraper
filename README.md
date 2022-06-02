@@ -10,6 +10,7 @@ Then run ts-node ./src/index.ts
 
 Settings are found inside [`config.json`](config.json)
 
+- `API_TOKEN_FILE` - Path to a file where the token is stored. If this file does not exist, fallback to `API_TOKEN`.
 - `API_TOKEN` - Your token from the [account page of clash royale](https://developer.clashroyale.com/#/account).
 - `DATA_PATH` - Where to store the output.
 - `DUMP_FILE` - Filename of the output njson file.
