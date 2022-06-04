@@ -184,29 +184,3 @@ async function main() {
 }
 
 main();
-
-console.log(
-  JSON.stringify(
-    mergeObjects(
-      {
-        prop1: [
-          {
-            "props1.2": {
-              string: ["test"],
-            },
-          },
-          null,
-        ],
-      },
-      {
-        prop1: [
-          {
-            "props1.2": {
-              string: ["test"],
-            },
-          },
-        ],
-      }
-    )
-  )
-);
