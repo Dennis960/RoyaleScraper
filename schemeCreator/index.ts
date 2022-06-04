@@ -6,7 +6,8 @@ import { Presets, SingleBar } from "cli-progress";
 import { config } from "../src/config";
 
 let FILE_PATH = config.DATA_PATH + config.DUMP_FILE;
-const jsonCount = 50000;
+const jsonCount = 20000;
+const shouldAddData = false;
 
 function isObject(obj: any): boolean {
   return (
@@ -134,7 +135,11 @@ function mergeArray(allElements: any[]): any {
 
 function generateSchemeFromObject(obj: any): any {
   if (typeof obj === "string") {
-    return { string: typeof obj };
+    if (shouldAddData) {
+      return { string: obj };
+    } else {
+      return typeof obj;
+    }
   } else if (Array.isArray(obj)) {
     if (obj.length > 0) {
       return obj.map((element) => generateSchemeFromObject(element));
@@ -150,7 +155,11 @@ function generateSchemeFromObject(obj: any): any {
     }
     return scheme;
   }
-  return { [typeof obj]: typeof obj };
+  if (shouldAddData) {
+    return { [typeof obj]: obj };
+  } else {
+    return typeof obj;
+  }
 }
 
 async function main() {
