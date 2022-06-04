@@ -5,7 +5,7 @@
   "DATA_PATH": "./data/",
   "DUMP_FILE": "stuff.njson",
   "PLAYER_TAGS_FILE": "playerTags.csv",
-  "SCHEMA_FILE": "schema.json",
+  "SCHEME_FILE": "scheme.json",
   "SHOULD_PRINT_PROGRESS": true,
 
   "STACK_SIZE": 4,
