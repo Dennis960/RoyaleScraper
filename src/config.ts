@@ -5,7 +5,7 @@ export const config: {
   DATA_PATH: string;
   DUMP_FILE: string;
   PLAYER_TAGS_FILE: string;
-  SCHEMA_FILE: string;
+  SCHEME_FILE: string;
   SHOULD_PRINT_PROGRESS: boolean;
 
   STACK_SIZE: number;

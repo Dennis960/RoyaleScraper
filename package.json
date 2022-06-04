@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "create-schema": "ts-node schemaCreator/index.ts"
+    "create-scheme": "ts-node schemeCreator/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,8 +15,6 @@
     "ts-node": "^10.8.0"
   },
   "dependencies": {
-    "@types/node-fetch": "^2.6.1",
-    "generate-schema": "^2.6.0",
-    "json-diff": "^0.9.0"
+    "@types/node-fetch": "^2.6.1"
   }
 }
