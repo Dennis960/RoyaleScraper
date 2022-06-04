@@ -131,23 +131,23 @@ function mergeArray(allElements: any[]): any {
   return outArray;
 }
 
-function generateSchemeFromObject(obj: any): any {
+function generateSchemaFromObject(obj: any): any {
   if (typeof obj === "string") {
     return { string: [obj] };
   } else if (Array.isArray(obj)) {
     if (obj.length > 0) {
-      return obj.map((element) => generateSchemeFromObject(element));
+      return obj.map((element) => generateSchemaFromObject(element));
     } else {
       return [];
     }
   } else if (typeof obj === "object" && obj !== null) {
-    let scheme: any = {};
+    let schema: any = {};
     const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
-      scheme[key] = generateSchemeFromObject(obj[key]);
+      schema[key] = generateSchemaFromObject(obj[key]);
     }
-    return scheme;
+    return schema;
   }
   return { [typeof obj]: [obj] };
 }
@@ -164,20 +164,20 @@ async function main() {
   });
 
   let i = 0;
-  let mainScheme: any = {};
+  let mainSchema: any = {};
   for await (const line of lines) {
-    const jsonScheme = generateSchemeFromObject(JSON.parse(line));
+    const jsonSchema = generateSchemaFromObject(JSON.parse(line));
     if (i == 0) {
       i += 1;
-      mainScheme = jsonScheme;
+      mainSchema = jsonSchema;
       continue;
     }
-    mainScheme = mergeObjects(mainScheme, jsonScheme);
+    mainSchema = mergeObjects(mainSchema, jsonSchema);
     i += 1;
     bar.increment();
     writeFile(
-      config.DATA_PATH + config.SCHEME_FILE,
-      JSON.stringify(mainScheme)
+      config.DATA_PATH + config.SCHEMA_FILE,
+      JSON.stringify(mainSchema)
     );
     if (i > jsonCount) {
       break;
