@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "create-scheme": "ts-node schemeCreator/index.ts"
+    "create-schema": "ts-node schemaCreator/index.ts"
   },
   "keywords": [],
   "author": "",
