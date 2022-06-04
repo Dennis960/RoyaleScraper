@@ -77,6 +77,9 @@ function mergeObjects(objA: any, objB: any): any {
       return null;
     }
     if (isArray(objB)) {
+      if (objB.includes(null)) {
+        return objB;
+      }
       return mergeArray(objB.concat([null]));
     }
   }
@@ -88,6 +91,9 @@ function mergeObjects(objA: any, objB: any): any {
       return null;
     }
     if (isArray(objA)) {
+      if (objA.includes(null)) {
+        return objA;
+      }
       return mergeArray(objA.concat([null]));
     }
   }
