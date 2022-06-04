@@ -31,6 +31,6 @@ Final file size: 2.7 GB
 # Scheme Creator
 
 Run with `npm run create-scheme`.  
-Takes the created njson from settings dump file path `DUMP_FILE` and creates a json scheme from the specified amount of data `jsonCount`.
-It is also possible to view all the possible values in the final `scheme.json` by setting `const shouldAddData = true;`.
+Takes the created njson from settings dump file path `DUMP_FILE` and creates a json scheme from the specified amount of data `jsonCount`.  
+It is also possible to view all the possible values in the final `scheme.json` by setting `const shouldAddData = true;`.  
 The `scheme.json` will be saved in the specified `DATA_PATH` folder.
