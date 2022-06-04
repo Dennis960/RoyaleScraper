@@ -1,0 +1,24 @@
+{
+  "input": [
+    {
+      "prop1": [
+        {
+          "props1.2": {
+            "string": ["test"]
+          }
+        },
+        null
+      ]
+    },
+    {
+      "prop1": [
+        {
+          "props1.2": {
+            "string": ["test"]
+          }
+        }
+      ]
+    }
+  ],
+  "merged": {}
+}
