@@ -6,6 +6,7 @@ import { Presets, SingleBar } from "cli-progress";
 import { config } from "../src/config";
 
 let FILE_PATH = config.DATA_PATH + config.DUMP_FILE;
+const jsonCount = 50000;
 
 function isObject(obj: any): boolean {
   return (
@@ -133,7 +134,7 @@ function mergeArray(allElements: any[]): any {
 
 function generateSchemaFromObject(obj: any): any {
   if (typeof obj === "string") {
-    return { string: [obj] };
+    return { string: typeof obj };
   } else if (Array.isArray(obj)) {
     if (obj.length > 0) {
       return obj.map((element) => generateSchemaFromObject(element));
@@ -149,10 +150,9 @@ function generateSchemaFromObject(obj: any): any {
     }
     return schema;
   }
-  return { [typeof obj]: [obj] };
+  return { [typeof obj]: typeof obj };
 }
 
-const jsonCount = 200;
 async function main() {
   const bar = new SingleBar({}, Presets.shades_classic);
   bar.start(jsonCount, 0);
@@ -175,14 +175,11 @@ async function main() {
     mainSchema = mergeObjects(mainSchema, jsonSchema);
     i += 1;
     bar.increment();
-    writeFile(
-      config.DATA_PATH + config.SCHEMA_FILE,
-      JSON.stringify(mainSchema)
-    );
     if (i > jsonCount) {
       break;
     }
   }
+  writeFile(config.DATA_PATH + config.SCHEMA_FILE, JSON.stringify(mainSchema));
   bar.stop();
 }
 
