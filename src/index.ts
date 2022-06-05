@@ -75,6 +75,8 @@ async function getAllOpponents(
           let opponentPlayerTag: string = battle["opponent"][0]["tag"];
           opponentPlayerTags.push(opponentPlayerTag);
         }
+      } else if (playerData) {
+        addPlayerToFile(playerTag, playerData, []);
       }
     })
   );

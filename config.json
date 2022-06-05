@@ -1,13 +1,13 @@
 {
   "API_TOKEN_FILE": "./Token",
   "API_TOKEN": "",
-  "API_URL": "https://api.clashroyale.com/v1/",
+  "API_URL": "https://api.clashofclans.com/v1/",
   "DATA_PATH": "./data/",
-  "DUMP_FILE": "stuff.njson",
+  "DUMP_FILE": "clash.njson",
   "PLAYER_TAGS_FILE": "playerTags.csv",
-  "SCHEME_FILE": "scheme.json",
+  "SCHEME_FILE": "clashScheme.json",
   "SHOULD_PRINT_PROGRESS": true,
 
   "STACK_SIZE": 4,
-  "ITERATION_COUNT": 20
+  "ITERATION_COUNT": 1
 }
