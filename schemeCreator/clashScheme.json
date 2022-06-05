@@ -1,0 +1,116 @@
+{
+  "tag": "string",
+  "timestamp": "number",
+  "player": {
+    "tag": "string",
+    "name": "string",
+    "townHallLevel": "number",
+    "townHallWeaponLevel": ["number", null, null],
+    "expLevel": "number",
+    "trophies": "number",
+    "bestTrophies": "number",
+    "warStars": "number",
+    "attackWins": "number",
+    "defenseWins": "number",
+    "builderHallLevel": ["number", null, null],
+    "versusTrophies": "number",
+    "bestVersusTrophies": "number",
+    "versusBattleWins": "number",
+    "role": ["string", null, null],
+    "warPreference": ["string", null, null],
+    "donations": "number",
+    "donationsReceived": "number",
+    "clan": [
+      null,
+      {
+        "tag": "string",
+        "name": "string",
+        "clanLevel": "number",
+        "badgeUrls": {
+          "small": "string",
+          "large": "string",
+          "medium": "string"
+        }
+      }
+    ],
+    "league": [
+      null,
+      {
+        "id": "number",
+        "name": "string",
+        "iconUrls": { "small": "string", "tiny": "string", "medium": "string" }
+      }
+    ],
+    "legendStatistics": [
+      null,
+      {
+        "legendTrophies": "number",
+        "previousSeason": [
+          null,
+          { "id": "string", "rank": "number", "trophies": "number" }
+        ],
+        "bestSeason": [
+          null,
+          { "id": "string", "rank": "number", "trophies": "number" }
+        ],
+        "bestVersusSeason": [
+          null,
+          { "id": "string", "rank": "number", "trophies": "number" }
+        ],
+        "currentSeason": {
+          "rank": ["number", null, null],
+          "trophies": "number"
+        },
+        "previousVersusSeason": [
+          null,
+          { "id": "string", "rank": "number", "trophies": "number" }
+        ]
+      }
+    ],
+    "achievements": [
+      {
+        "name": "string",
+        "stars": "number",
+        "value": "number",
+        "target": "number",
+        "info": "string",
+        "completionInfo": ["string", "object"],
+        "village": "string"
+      }
+    ],
+    "versusBattleWinCount": "number",
+    "labels": [
+      {
+        "id": "number",
+        "name": "string",
+        "iconUrls": { "small": "string", "medium": "string" }
+      }
+    ],
+    "troops": [
+      {
+        "name": "string",
+        "level": "number",
+        "maxLevel": "number",
+        "village": "string",
+        "superTroopIsActive": [null, "boolean"]
+      }
+    ],
+    "heroes": [
+      {
+        "name": "string",
+        "level": "number",
+        "maxLevel": "number",
+        "village": "string"
+      }
+    ],
+    "spells": [
+      {
+        "name": "string",
+        "level": "number",
+        "maxLevel": "number",
+        "village": "string"
+      }
+    ]
+  },
+  "battleLog": [null]
+}
